@@ -1,4 +1,4 @@
-name: "🧱 Task"
+name: "Task"
 description: "A piece of work for the board. Keep it small enough to finish in a day or two."
 title: "[Task] "
 body:
@@ -9,14 +9,14 @@ body:
   - type: textarea
     id: what
     attributes:
-      label: "✨ What needs to be done"
+      label: "What needs to be done"
       placeholder: "Load the DPWH projects from the API into raw.dpwh_projects."
     validations:
       required: true
   - type: dropdown
     id: layer
     attributes:
-      label: "🧱 Layer"
+      label: "Layer"
       options:
         - raw
         - clean
@@ -30,7 +30,7 @@ body:
   - type: textarea
     id: done
     attributes:
-      label: "✅ Done when"
+      label: "Done when"
       value: |
         - [ ] 
         - [ ] 
@@ -39,5 +39,5 @@ body:
   - type: textarea
     id: notes
     attributes:
-      label: "📎 Links and notes"
+      label: "Links and notes"
       placeholder: "Links to the source card, the notebook or a screenshot."

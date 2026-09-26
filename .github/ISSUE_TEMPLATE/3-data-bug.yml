@@ -1,4 +1,4 @@
-name: "🐞 Data bug"
+name: "Data bug"
 description: "Something in a table or notebook looks wrong."
 title: "[Bug] "
 labels: ["bug"]
@@ -6,19 +6,19 @@ body:
   - type: input
     id: where
     attributes:
-      label: "📍 Where"
+      label: "Where"
       placeholder: "Notebook or table name, like clean.dpwh_projects"
     validations:
       required: true
   - type: textarea
     id: what
     attributes:
-      label: "🤔 What happened"
+      label: "What happened"
       placeholder: "What you ran, what you expected and what you got."
     validations:
       required: true
   - type: textarea
     id: proof
     attributes:
-      label: "📸 Proof"
+      label: "Proof"
       placeholder: "Paste the query and a screenshot of the result."

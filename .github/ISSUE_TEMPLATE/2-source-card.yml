@@ -1,4 +1,4 @@
-name: "📚 Source card"
+name: "Source card"
 description: "Add or update a data source we plan to use."
 title: "[Source] "
 labels: ["docs"]
@@ -10,21 +10,21 @@ body:
   - type: input
     id: name
     attributes:
-      label: "📛 Source name"
+      label: "Source name"
       placeholder: "DPWH projects (BetterGov API)"
     validations:
       required: true
   - type: input
     id: link
     attributes:
-      label: "🔗 Link"
+      label: "Link"
       placeholder: "https://"
     validations:
       required: true
   - type: dropdown
     id: format
     attributes:
-      label: "📦 Format"
+      label: "Format"
       options:
         - API (JSON)
         - CSV
@@ -35,20 +35,20 @@ body:
   - type: input
     id: size
     attributes:
-      label: "📏 Size"
+      label: "Size"
       placeholder: "About how many rows or how many MB"
   - type: input
     id: refresh
     attributes:
-      label: "🔄 How often it changes"
+      label: "How often it changes"
       placeholder: "Daily, every quarter, once"
   - type: textarea
     id: fields
     attributes:
-      label: "🧾 Fields we need"
+      label: "Fields we need"
       placeholder: "contractId, budget, amountPaid, progress, latitude, longitude"
   - type: textarea
     id: risks
     attributes:
-      label: "⚠️ What can go wrong"
+      label: "What can go wrong"
       placeholder: "Missing map points, place names that do not match PSGC, duplicates"
