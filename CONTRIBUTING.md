@@ -56,6 +56,14 @@ If a critical check fails, the run stops. Do not skip a failed check to make the
 - When you rename or move a file, fix every link that points to it.
 - Delete or clearly label old files, so no one runs the wrong one.
 
+## Where we talk
+
+- **Messenger:** day-to-day team chat
+- **Slack:** the official FTW channel, for pins and context
+- **Viber:** our chat with our SI and mentor
+
+If we decide something in chat, write it in the team doc too.
+
 ## Found a problem?
 
 Open an issue with the **Data bug** template. Say what you ran, what you expected and what you got.

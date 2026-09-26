@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="assets/banners/bd-github-readme.png" alt="Built Different. Every project. Every peso. Every place." width="100%">
+  <img src="assets/banners/github-readme.png" alt="Buildabida. Every project. Every peso. Every place." width="100%">
 </p>
 
 # Infrastructure Project Monitoring Pipeline
 
 This project tracks public works projects in the Philippines, from the source data to a dashboard. It joins DPWH project records with official place codes (PSGC) and the 2024 census. This lets us see where project money goes, how far each project has gone, and how that compares with the number of people in each place.
 
-Built by team Built Different (LT2) for the FTW Foundation Data Engineering Track capstone, 2026.
+Built by team Buildabida (LT2) for the FTW Foundation Data Engineering Track capstone, 2026.
 
 > **Status:** Planning. The schema is due on Oct 3, 2026. The run steps below are filled in as each layer is built.
 
@@ -99,7 +99,7 @@ The full run order is added when the first notebooks are merged.
 
 1. In Databricks, open **Workspace** and go to your home folder.
 2. Click **Create**, then **Git folder**.
-3. Paste `https://github.com/czekinah/built-different-capstone.git` and click **Create Git folder**.
+3. Paste `https://github.com/czekinah/buildabida-capstone.git` and click **Create Git folder**.
 4. Before you run anything, click the branch name and then **Pull**.
 
 ### Run order
