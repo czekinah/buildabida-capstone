@@ -2,60 +2,41 @@
   <img src="assets/banners/bd-github-readme.png" alt="Built Different. Every project. Every peso. Every place." width="100%">
 </p>
 
-<p align="center">
-  <img alt="Team: Built Different" src="https://img.shields.io/badge/team-Built_Different-E6DDFF?style=for-the-badge&labelColor=2B2A4C">
-  <img alt="Topic: Infrastructure Project Monitoring" src="https://img.shields.io/badge/topic-Infrastructure_Monitoring-D2F4E4?style=for-the-badge&labelColor=2B2A4C">
-  <img alt="Built on Databricks" src="https://img.shields.io/badge/built_on-Databricks-FFDCC8?style=for-the-badge&labelColor=2B2A4C">
-  <img alt="Graduation: Oct 24, 2026" src="https://img.shields.io/badge/graduation-Oct_24_2026-FFF2BF?style=for-the-badge&labelColor=2B2A4C">
-</p>
+# Infrastructure Project Monitoring Pipeline
 
-<p align="center">
-  <b>LT2 · FTW Foundation Data Engineering Track · Capstone 2026</b><br>
-  <a href="#-what-we-are-building">What</a> ·
-  <a href="#-the-pipeline">Pipeline</a> ·
-  <a href="#-data-sources">Data</a> ·
-  <a href="#-timeline">Timeline</a> ·
-  <a href="#-how-we-work">How we work</a> ·
-  <a href="#-the-team">Team</a>
-</p>
+This project tracks public works projects in the Philippines, from the source data to a dashboard. It joins DPWH project records with official place codes (PSGC) and the 2024 census. This lets us see where project money goes, how far each project has gone, and how that compares with the number of people in each place.
 
-<img src="assets/banners/bd-strip-home.png" alt="Start Here" width="100%">
+Built by team Built Different (LT2) for the FTW Foundation Data Engineering Track capstone, 2026.
 
-## 🏗️ What we are building
+> **Status:** Planning. The schema is due on Oct 3, 2026. The run steps below are filled in as each layer is built.
 
-A data pipeline that follows public works projects in the Philippines from start to finish.
+## Who it is for
 
-We pull DPWH project data, match every project to a real place, add how many people live there, and check the data at every step. The end result is a dashboard that shows where the money goes, how far each project got, and which places may be left out.
+- People who want to check public works spending in their province or city
+- Planners who want to find places with many people but few projects
+- Our mentor, support instructor and judges, who need to run and check the pipeline
 
-> [!NOTE]
-> **Main question (draft):** Where do public works pesos go, and do the projects reach the places with the most people?
->
-> We lock the final question with our mentor before the schema is due on Oct 3.
+## Questions
 
-**Questions we want the dashboard to answer**
+Our main question is a draft. We will confirm it with our mentor before Oct 3.
 
-| # | Question | What it shows |
-| :-: | --- | --- |
-| 1 | How much went to each region and province? | Total budget and budget per person |
-| 2 | Which projects are late or stuck? | Progress and dates by place |
-| 3 | Does the money paid match the work done? | Amount paid next to progress |
-| 4 | How do flood control projects compare? | Flood control next to other project types |
-| 5 | Which places have many people but few projects? | Population next to project count |
+**Main question:** Where does public works money go, and does it reach the places with the most people?
 
-<img src="assets/banners/bd-strip-plan.png" alt="Plan and Roles" width="100%">
+1. How much project money went to each region and province, in total and per person?
+2. Which projects are late or not moving?
+3. Does the amount paid match the reported progress?
+4. How do flood control projects compare with other project types?
+5. Which places have many people but few projects?
 
-## 🧱 The pipeline
+## How it works
 
 ```mermaid
 flowchart LR
-    A["DPWH projects<br>BetterGov API"]:::src --> R[("raw")]:::raw
-    B["Flood control<br>Sumbong sa Pangulo"]:::src --> R
-    C["PSGC codes<br>and maps"]:::src --> R
-    D["PSA 2024<br>population"]:::src --> R
-    R --> CL[("clean")]:::clean
-    CL --> M[("mart")]:::mart
-    M --> DB["Dashboard"]:::dash
-    CL -.-> V{{"validation"}}:::val
+    S["Sources<br>DPWH projects, flood control,<br>PSGC, census, maps"]:::src --> R["raw"]:::raw
+    R --> C["clean"]:::clean
+    C --> M["mart"]:::mart
+    M --> D["Dashboard"]:::dash
+    C -.-> V["validation"]:::val
     M -.-> V
     classDef src fill:#D7E8FF,stroke:#2B2A4C,color:#2B2A4C
     classDef raw fill:#FFDCC8,stroke:#2B2A4C,color:#2B2A4C
@@ -65,86 +46,126 @@ flowchart LR
     classDef dash fill:#FFD9E6,stroke:#2B2A4C,color:#2B2A4C
 ```
 
-| Layer | What happens here |
+| Layer | What it does |
 | --- | --- |
-| 🟧 **raw** | Land the data as it comes. No changes. Add the load date. |
-| 🟩 **clean** | Fix types and dates, remove duplicates, and give every project a PSGC place code. |
-| 🟨 **mart** | Build the tables the dashboard reads, like spending per province and per person. |
-| 🟪 **validation** | Run the checks and save the results in one table, so we can prove the data is right. |
+| raw | Keeps each source as it came, plus the load time. No changes. |
+| clean | Fixes types and dates, removes duplicates, and gives every project a PSGC code. |
+| mart | Holds the facts and dimensions that the dashboard reads. |
+| validation | Saves the result of every check. A failed critical check stops the run. |
 
-<img src="assets/banners/bd-strip-sources.png" alt="Data Sources" width="100%">
+## Data sources
 
-## 📚 Data sources
-
-| Source | What we use it for | Link |
-| --- | --- | --- |
-| DPWH projects (BetterGov API) | Every DPWH project with budget, amount paid, progress, dates, contractor and map point | [api.dpwh.bettergov.ph](https://api.dpwh.bettergov.ph/projects) |
-| DPWH Transparency Portal | The official source. We use it to spot-check our numbers. | [transparency.dpwh.gov.ph](https://transparency.dpwh.gov.ph) |
-| Sumbong sa Pangulo | Flood control projects | [sumbongsapangulo.ph](https://sumbongsapangulo.ph) |
-| PSGC 2Q 2026 (PSA) | Official codes for every region, province, city, town and barangay | [psa.gov.ph/classification/psgc](https://psa.gov.ph/classification/psgc) |
-| 2024 Census of Population (PSA) | How many people live in each place | [psa.gov.ph](https://psa.gov.ph) |
-| Boundary maps | Match each project's map point to a place | [BetterGov open data](https://data.bettergov.ph/datasets/23) · [HDX](https://data.humdata.org/dataset/cod-ab-phl) |
-
-Each source gets a source card in our team doc: who owns it, how big it is, how often it changes, and what can go wrong.
-
-<img src="assets/banners/bd-strip-timeline.png" alt="Timeline" width="100%">
-
-## 📅 Timeline
-
-| Date | Milestone | Done when |
-| --- | --- | --- |
-| **Sat, Sep 26** | 🚀 Kickoff | Team, name and leader set |
-| **Sat, Oct 3** | 🧩 Schema | Source cards done and the schema is reviewed |
-| **Sat, Oct 10** | 🟨 Gold marts | Clean and mart tables pass their checks. Team photoshoot. |
-| **Sat, Oct 17** | 📊 Dashboards and judging | Dashboard done, cert exam, judged presentation |
-| **Sat, Oct 24** | 🎓 Graduation | Repo and README are final |
-
-Every week: mentor and SI check-ins from Monday to Wednesday, sponsor check-ins on Thursday or Friday, and one team work day.
-
-<img src="assets/banners/bd-strip-quality.png" alt="Quality Checks" width="100%">
-
-## 🤝 How we work
-
-1. Pull `main` before you start.
-2. Make a branch named for the work, like `feature/raw-dpwh-projects` or `docs/source-cards`.
-3. Commit small changes with clear messages.
-4. Open a pull request into `main` and fill in the template.
-5. One teammate reviews it. Then Kinah merges.
-
-Read the full rules in [CONTRIBUTING.md](CONTRIBUTING.md). Our tasks live in the Issues tab and on the project board.
-
-**Where things live**
-
-| Place | What goes there |
+| Source | What we use it for |
 | --- | --- |
-| 💬 Slack | Team chat, the team canvas and quick questions |
-| 📱 Viber | Fast pings and reminders |
-| 📝 Team Google Doc | Plans, source cards, decisions, meeting notes and the data dictionary |
-| 🐙 GitHub | Code, issues and the project board |
-| 🧱 Databricks | Notebooks, tables, jobs and the dashboard |
+| [DPWH projects API](https://api.dpwh.bettergov.ph/projects) by BetterGov.ph | Every DPWH project with budget, amount paid, progress, dates, contractor and map point. About 265,000 projects as of Sep 2026. |
+| [DPWH Transparency Portal](https://transparency.dpwh.gov.ph) | The official source. We use it to spot-check the API. |
+| [Sumbong sa Pangulo](https://sumbongsapangulo.ph) | Flood control projects |
+| [PSGC 2Q 2026](https://psa.gov.ph/classification/psgc) by PSA | Official codes for 18 regions, 82 provinces, 149 cities, 1,493 towns and 42,010 barangays |
+| [2024 Census of Population](https://psa.gov.ph) by PSA | Population of each place |
+| [Boundary maps](https://data.humdata.org/dataset/cod-ab-phl) on HDX | Matching each project's map point to a place |
 
-## 🗂️ Repo map
+Notes on the sources:
+
+- In the API, `location.province` holds a DPWH district office name, like `Albay 2nd DEO`. It is not a PSGC province. We use the map point and the boundary maps to find the real place.
+- Some projects may appear in both the DPWH list and the flood control list. We match them by contract ID so we do not count them twice.
+
+## Data model (draft)
+
+The final schema is due on Oct 3. This is our starting point.
+
+| Table | One row is | Key |
+| --- | --- | --- |
+| `raw.dpwh_projects` | One project, as the API returns it | `contract_id` |
+| `raw.flood_control_projects` | One flood control project | `contract_id` |
+| `raw.psgc` | One place in the PSGC list | `psgc_code` |
+| `raw.population_2024` | One place and its 2024 population | `psgc_code` |
+| `clean.projects` | One project from any source, with a PSGC code | `contract_id` |
+| `mart.dim_place` | One region, province, city or town | `psgc_code` |
+| `mart.dim_project_type` | One project type | `project_type_id` |
+| `mart.fact_project` | One project | `contract_id` |
+| `validation.dq_results` | One check on one column in one run | `run_id`, `table_name`, `column_name`, `check_name` |
+
+## How to run
+
+The full run order is added when the first notebooks are merged.
+
+### Requirements
+
+- A Databricks Free Edition account
+- Read access to this repo
+- Databricks access to the source links above. See [Known limits](#known-limits).
+
+### Setup
+
+1. In Databricks, open **Workspace** and go to your home folder.
+2. Click **Create**, then **Git folder**.
+3. Paste `https://github.com/czekinah/built-different-capstone.git` and click **Create Git folder**.
+4. Before you run anything, click the branch name and then **Pull**.
+
+### Run order
+
+| Step | Folder | What it does | Status |
+| --- | --- | --- | --- |
+| 1 | `pipelines/01_raw` | Loads each source into `raw` | Planned |
+| 2 | `pipelines/02_clean` | Builds `clean` tables and adds PSGC codes | Planned |
+| 3 | `pipelines/03_mart` | Builds the facts and dimensions | Planned |
+| 4 | `pipelines/04_validation` | Runs all checks and saves the results | Planned |
+
+## Validation
+
+Every run checks the data before it moves to the next layer.
+
+| Check | Example | If it fails |
+| --- | --- | --- |
+| Not null | `contract_id` is never empty | Stop the run |
+| Unique | One row per `contract_id` in `clean.projects` | Stop the run |
+| Row counts | Raw, clean and mart totals match, after known drops | Stop the run |
+| Valid range | `progress` is from 0 to 100 | Flag the row |
+| Map point | The point is inside the Philippines | Flag the row |
+| Place match | Every project has a PSGC code | Flag and report the match rate |
+| Money | `amount_paid` is not more than `budget` | Flag the row |
+
+Results go to `validation.dq_results` with the same columns we used in Week 9: `column`, `data_quality_check`, `failed_rows`, `total_rows`, `percentage` and `status`.
+
+A GitHub Actions check also looks for broken links in our Markdown files on every pull request.
+
+## Decisions
+
+We log each decision with an ID, the options we looked at, and why we picked one. Open decisions right now:
+
+| ID | Question |
+| --- | --- |
+| D-01 | Which Databricks workspace runs the final pipeline and dashboard? |
+| D-02 | What is our final main question? |
+| D-03 | How do we match a project to a place: map point, office name, or both? |
+| D-04 | How do we handle projects that are in both the DPWH and flood control lists? |
+
+## Known limits
+
+- Databricks Free Edition only lets notebooks reach trusted websites. If a source is blocked, we download the file and upload it to a Databricks volume, and we note the download date.
+- Each of us has our own Free Edition workspace. We share code through this repo, not through one workspace.
+
+## Repo structure
 
 ```
-built-different-capstone/
-├── assets/banners/   team banners
-├── pipelines/        Databricks notebooks, one folder per layer
-├── docs/             source cards, schema and data dictionary
-└── .github/          issue and pull request templates
+.
+├── README.md          this file
+├── CONTRIBUTING.md    how we branch, review and merge
+├── assets/banners/    team images
+├── pipelines/         Databricks notebooks, one folder per layer
+├── docs/              source cards, schema, data model and decisions
+└── .github/           issue and pull request templates, and checks
 ```
 
-<img src="assets/banners/bd-strip-team.png" alt="Team Space" width="100%">
+## Team and timeline
 
-## 💜 The team
+Kinah (lead), Bri, Nadine, Sam and Tricia. Mentor: Carmi. Support instructor: Simonee.
 
-| | Name | Role |
-| :-: | --- | --- |
-| 👑 | Kinah | Team lead |
-| 🧱 | Bri | Data engineer |
-| 🧱 | Nadine | Data engineer |
-| 🧱 | Sam | Data engineer |
-| 🧱 | Tricia | Data engineer |
+Tasks are GitHub issues, and the project board shows who is working on what. Every change goes through a pull request with one review. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**Mentor:** Carmi · **Support instructor:** Simonee
-
-<p align="center"><sub>Built by team Built Different for the FTW Foundation Data Engineering Track 2026.</sub></p>
+| Date | Milestone |
+| --- | --- |
+| Oct 3 | Source cards and schema |
+| Oct 10 | Clean and mart tables pass their checks |
+| Oct 17 | Dashboard, cert exam and judged presentation |
+| Oct 24 | Graduation. Final README and docs. |
