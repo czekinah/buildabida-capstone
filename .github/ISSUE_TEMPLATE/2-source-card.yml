@@ -1,0 +1,54 @@
+name: "📚 Source card"
+description: "Add or update a data source we plan to use."
+title: "[Source] "
+labels: ["docs"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A source card tells the team what a dataset is, where it lives and what can go wrong. Copy the final card into the team doc too.
+  - type: input
+    id: name
+    attributes:
+      label: "📛 Source name"
+      placeholder: "DPWH projects (BetterGov API)"
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: "🔗 Link"
+      placeholder: "https://"
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: "📦 Format"
+      options:
+        - API (JSON)
+        - CSV
+        - Excel
+        - Shapefile or GeoJSON
+        - Web page
+        - Other
+  - type: input
+    id: size
+    attributes:
+      label: "📏 Size"
+      placeholder: "About how many rows or how many MB"
+  - type: input
+    id: refresh
+    attributes:
+      label: "🔄 How often it changes"
+      placeholder: "Daily, every quarter, once"
+  - type: textarea
+    id: fields
+    attributes:
+      label: "🧾 Fields we need"
+      placeholder: "contractId, budget, amountPaid, progress, latitude, longitude"
+  - type: textarea
+    id: risks
+    attributes:
+      label: "⚠️ What can go wrong"
+      placeholder: "Missing map points, place names that do not match PSGC, duplicates"
