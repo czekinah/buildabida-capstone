@@ -10,7 +10,7 @@ body:
     id: what
     attributes:
       label: "What needs to be done"
-      placeholder: "Load the DPWH projects from the API into raw.dpwh_projects."
+      placeholder: "Load the DPWH projects from the API into bronze.dpwh_projects."
     validations:
       required: true
   - type: dropdown
@@ -18,9 +18,9 @@ body:
     attributes:
       label: "Layer"
       options:
-        - raw
-        - clean
-        - mart
+        - bronze
+        - silver
+        - gold
         - validation
         - dashboard
         - docs
