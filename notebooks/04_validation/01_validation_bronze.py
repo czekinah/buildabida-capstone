@@ -8,6 +8,8 @@
 # MAGIC - **flag**: the data is usable, but silver has to handle these rows. The percentage tells us how big the problem is.
 # MAGIC
 # MAGIC Each check is one SQL line in the list below. To add a check, add a line. Tables that are not loaded yet are skipped.
+# MAGIC
+# MAGIC Most checks count rows. The checks that add up counts are different: `failed_rows` is how far off the total is (places or people), and `total_rows` is the total we expect. So the percentage still means how far off we are.
 
 # COMMAND ----------
 
@@ -23,6 +25,11 @@ LAT, LON = config.PH_LAT, config.PH_LON
 IN_PH = f"latitude BETWEEN {LAT[0]} AND {LAT[1]} AND longitude BETWEEN {LON[0]} AND {LON[1]}"
 LEVELS = {"Reg": 18, "Prov": 82, "City": 149, "Mun": 1493, "SubMun": 14, "Bgy": 42010}  # PSGC 2Q 2026 summary
 PEOPLE_IN_REGIONS = 112_727_776  # 2024 census: 112,729,484 minus 1,708 Filipinos in embassies abroad
+
+
+def off_by(difference, expected, table):
+    """For checks that add things up: how far off the total is, out of the total we expect."""
+    return f"SELECT {difference} AS failed_rows, {expected} AS total_rows FROM {bronze.table_name(table)}"
 
 
 def log_count(table):
@@ -63,11 +70,11 @@ CHECKS = [
     ("psgc", "psgc_code", "not null", "COUNT_IF(psgc_code IS NULL)", "stop"),
     ("psgc", "psgc_code", "unique", "COUNT(*) - COUNT(DISTINCT psgc_code)", "stop"),
     ("psgc", "psgc_code", "10 digits", "COUNT_IF(NOT psgc_code RLIKE '^[0-9]{10}$')", "flag"),
-    ("psgc", "geographic_level", "counts match the PSA summary", " + ".join(f"ABS(COUNT_IF(geographic_level = '{k}') - {v})" for k, v in LEVELS.items()), "flag"),
-    ("population_2024", "population_2024", "regions add up to the census total", f"ABS(SUM(IF(geographic_level = 'Reg', population_2024, 0)) - {PEOPLE_IN_REGIONS})", "flag"),
-    ("population_2024", "population_2024", "barangays add up to the census total", f"ABS(SUM(IF(geographic_level = 'Bgy', population_2024, 0)) - {PEOPLE_IN_REGIONS})", "flag"),
+    ("psgc", "geographic_level", "counts match the PSA summary", off_by(" + ".join(f"ABS(COUNT_IF(geographic_level = '{k}') - {v})" for k, v in LEVELS.items()), sum(LEVELS.values()), "psgc"), "flag"),
+    ("population_2024", "population_2024", "regions add up to the census total", off_by(f"ABS(SUM(IF(geographic_level = 'Reg', population_2024, 0)) - {PEOPLE_IN_REGIONS})", PEOPLE_IN_REGIONS, "population_2024"), "flag"),
+    ("population_2024", "population_2024", "barangays add up to the census total", off_by(f"ABS(SUM(IF(geographic_level = 'Bgy', population_2024, 0)) - {PEOPLE_IN_REGIONS})", PEOPLE_IN_REGIONS, "population_2024"), "flag"),
     ("census_2024_table_b", "row count", "matches the file", log_count("census_2024_table_b"), "stop"),
-    ("census_2024_table_b", "pop_2024", "regions add up to the census total", f"ABS(SUM(IF(is_region, pop_2024, 0)) - {PEOPLE_IN_REGIONS})", "flag"),
+    ("census_2024_table_b", "pop_2024", "regions add up to the census total", off_by(f"ABS(SUM(IF(is_region, pop_2024, 0)) - {PEOPLE_IN_REGIONS})", PEOPLE_IN_REGIONS, "census_2024_table_b"), "flag"),
     ("boundaries", "row count", "matches the files", log_count("boundaries"), "stop"),
     ("boundaries", "geometry_json", "not null", "COUNT_IF(geometry_json IS NULL)", "stop"),
     ("boundaries", "psgc_code", "not null", "COUNT_IF(psgc_code IS NULL)", "flag"),
