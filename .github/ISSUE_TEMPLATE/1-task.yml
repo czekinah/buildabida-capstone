@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for adding a task! Say what needs to be done and how we will know it is done.
+        Thanks for adding a task. Say what needs to be done and how we know it's done.
   - type: textarea
     id: what
     attributes:
