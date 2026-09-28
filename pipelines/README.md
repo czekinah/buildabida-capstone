@@ -12,15 +12,26 @@ Our Databricks notebooks, one folder per step. Run the folders in this order.
 
 We add each folder with its first notebook.
 
-## Shared code
+## Pick a language
 
-Names and links live in [`buildabida/config.py`](../buildabida/config.py). Helpers live next to it. Import them at the top of a notebook:
+- **SQL** for setup, silver, gold and validation. Most of us know SQL best, and Spark runs SQL and Python on the same engine, so neither one is faster.
+- **Python** only where SQL can't do the job, like calling an API or reading an Excel file. Keep that code short, and put helpers in the `buildabida` folder.
+
+## Start each notebook the same way
+
+In a SQL notebook, the first line picks our catalog. Then name each table as `schema.table`, like `silver.projects`:
+
+```sql
+USE CATALOG buildabida
+```
+
+In a Python notebook, import our names and links from [`buildabida/config.py`](../buildabida/config.py):
 
 ```python
 from buildabida import api, config
 ```
 
-This works because Databricks adds the repo folder to the Python path. Don't copy a name or a link into a notebook. Change it in `config.py`, and every notebook gets the change.
+This works because Databricks adds the repo folder to the Python path. Don't copy a link into a notebook. Change it in `config.py`, and every notebook gets the change.
 
 ## Notebook names
 
@@ -28,12 +39,12 @@ Use `NN_layer_source`, like `01_bronze_dpwh_projects` or `02_silver_psgc`. The n
 
 ## Each notebook should
 
-1. Say at the top what it makes and where its names come from.
-2. Import the catalog, schema and source names from `buildabida/config.py`.
+1. Say at the top what it makes.
+2. Use our `buildabida` catalog.
 3. Be safe to run twice. A second run with the same input adds no duplicate rows.
 4. End with its data quality checks.
 5. Say in a comment if AI helped write it, and what you checked.
 
 ## Code checks
 
-Ruff checks our Python code on every pull request. If it finds a problem, the pull request shows a red X and the details. Fix the line it names, then commit again.
+Every pull request runs two checks. SQLFluff checks our SQL, and Ruff checks our Python. If one finds a problem, the pull request shows a red X and the line to fix.
