@@ -18,3 +18,28 @@ jobs:
         with:
           args: --offline --no-progress './**/*.md'
           fail: true
+
+  markdown:
+    name: Check Markdown layout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v24
+        with:
+          globs: "**/*.md"
+
+  writing:
+    name: Give writing tips
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check our writing rules
+        uses: vale-cli/vale-action@v3
