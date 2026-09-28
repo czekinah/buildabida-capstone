@@ -18,11 +18,68 @@ Short rules for how we write and code. They come from the guides listed at the e
 12. **Keep each fact in one place.** Link to it instead of copying it.
 13. **Update the docs in the same pull request as the code.**
 
-Our house rules: no em dashes, no semicolons, and a 7th grade reading level or lower. To check the grade, paste your text into a free readability checker like [WebFX Read-Able](https://www.webfx.com/tools/read-able/).
+Our house rules for writing: no em dashes, no semicolons, and a 7th grade reading level or lower. Code is fine with semicolons. To check the grade, paste your text into a free readability checker like [WebFX Read-Able](https://www.webfx.com/tools/read-able/).
 
-## Write short, clear code
+## Pick SQL first
 
-1. **Keep names and links in `buildabida/config.py`.** Notebooks import them. Never copy a table name or a link into a notebook.
+Use SQL for setup, silver, gold and validation. Most of us know SQL best, and Spark runs SQL and Python on the same engine, so neither one is faster. Use Python only where SQL can't do the job, like calling an API or reading an Excel file.
+
+## Write clear SQL
+
+1. **Start with our catalog.** The first line of a SQL notebook is `USE CATALOG buildabida`. Then name each table as `schema.table`, like `silver.projects`.
+2. **Write keywords and functions in capitals.** Names stay in snake_case, like `SELECT contract_id`.
+3. **Put one column on each line,** with the comma at the end of the line.
+4. **Use CTEs, not nested queries.** Give each CTE one job and a name that says it, like `projects_with_places`. End with `SELECT * FROM` the last CTE.
+5. **Say the join type.** Write `INNER JOIN` or `LEFT JOIN`, never a plain `JOIN`. Don't use right joins.
+6. **Name every alias with `AS`,** like `amount_paid AS paid`. When you join, put the table alias before each column.
+7. **Use `UNION ALL`** unless you want to drop duplicate rows on purpose.
+8. **Make it safe to run twice.** Use `CREATE OR REPLACE TABLE` to rebuild a table, or `MERGE INTO` to add only new rows.
+9. **Use `TRY_CAST` for messy values,** so one bad value doesn't stop the run. Then count the new NULLs in your checks.
+10. **Keep one row per key with `QUALIFY`.** Rank the rows with `ROW_NUMBER()`, and keep the rows where the rank is 1.
+11. **Use `GROUP BY ALL`,** so you never leave out a column.
+12. **Add a comment to every gold table and column.** Genie reads them, so clear comments give better answers.
+
+Here's a short, clear silver table:
+
+```sql
+USE CATALOG buildabida;
+
+CREATE OR REPLACE TABLE silver.projects
+COMMENT 'One row per DPWH project'
+AS
+WITH latest AS (
+    SELECT
+        contract_id,
+        TRY_CAST(budget AS DECIMAL(18, 2)) AS budget,
+        TO_DATE(start_date) AS start_date,
+        loaded_at
+    FROM bronze.dpwh_projects
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY contract_id ORDER BY loaded_at DESC) = 1
+)
+
+SELECT * FROM latest;
+```
+
+### Let Databricks format your SQL
+
+1. In Databricks, open your **Home** folder.
+2. Click **Create**, then **File**, and name it `.dbsql-formatter-config.json`.
+3. Paste the settings below, then refresh the page.
+
+```json
+{
+  "keywordCasing": "uppercase",
+  "functionNameCasing": "uppercase",
+  "indentationWidth": 4,
+  "commaPosition": "end"
+}
+```
+
+Before you commit, click **Edit**, then **Format Notebook**. Your SQL now matches rules 2 and 3.
+
+## Write short, clear Python
+
+1. **Keep links and the catalog name in `buildabida/config.py`.** Python notebooks import them. Never copy a link into a notebook.
 2. **Put helpers in the `buildabida` folder, not in notebooks.** Import them with `from buildabida import api, config`. Don't use `%run`.
 3. **Give each step its own cell.** Only print or display what you need to check.
 4. **Name columns in snake_case.** True or false columns start with `is_` or `has_`. DataFrame names end in `_df`.
@@ -50,6 +107,7 @@ Every pull request runs these checks. A red X means a check found a problem. Cli
 
 | Check | What it looks at | How to fix it |
 | --- | --- | --- |
+| SQLFluff | SQL notebooks | Fix the line it names. For capitals, use **Format Notebook**. |
 | Ruff | Python code | Fix the line it names. |
 | Links | Links in Markdown files | Fix the path, or add the missing file. |
 | Markdown | The layout of Markdown files | Fix the line it names. |
@@ -62,6 +120,9 @@ Every pull request runs these checks. A red X means a check found a problem. Cli
 - [Diátaxis](https://diataxis.fr/), for how we split our docs
 - [Plain language guide](https://digital.gov/guides/plain-language/)
 - [Write the Docs guide](https://www.writethedocs.org/guide/)
+- [dbt SQL style guide](https://docs.getdbt.com/best-practices/how-we-style/2-how-we-style-our-sql) and [SQLFluff](https://docs.sqlfluff.com/)
+- [Databricks SQL formatting](https://docs.databricks.com/aws/en/sql/user/sql-editor/custom-format) and [Genie best practices](https://docs.databricks.com/aws/en/genie/best-practices)
+- [Where PySpark and Spark SQL fit best](https://community.databricks.com/t5/technical-blog/where-pyspark-and-sparksql-fit-best-in-the-enterprise/ba-p/111021)
 - [Palantir PySpark style guide](https://github.com/palantir/pyspark-style-guide)
 - [Databricks notebook best practices](https://docs.databricks.com/aws/en/notebooks/best-practices)
 - [Ruff](https://docs.astral.sh/ruff/)
