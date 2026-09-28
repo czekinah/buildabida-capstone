@@ -1,42 +1,23 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 00 Setup workspace
+# MAGIC # Set up the catalog
 # MAGIC
-# MAGIC Run this once in your own Databricks Free Edition workspace.
+# MAGIC Run this once in your own workspace. It is safe to run again.
 # MAGIC
-# MAGIC - **Reads:** nothing
-# MAGIC - **Writes:** the schemas `bronze`, `silver`, `gold` and `validation`, and the volume `bronze.landing` for files we download by hand
-# MAGIC - **Safe to run twice:** yes
-# MAGIC
-# MAGIC The default catalog in Free Edition is usually called `workspace`. If yours has another name, change the catalog box at the top.
+# MAGIC - **Makes:** the `buildabida` catalog, the `bronze`, `silver`, `gold` and `validation` schemas, and the `bronze.landing` volume
+# MAGIC - **Names come from:** `buildabida/config.py`
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "workspace", "Catalog")
+from buildabida import config
+
+dbutils.widgets.text("catalog", config.CATALOG)
 catalog = dbutils.widgets.get("catalog")
-print(f"Using catalog: {catalog}")
 
-# COMMAND ----------
-
-layers = {
-    "bronze": "Each source as it came, plus the load time",
-    "silver": "Cleaned data with PSGC codes",
-    "gold": "Gold marts for the dashboard and Genie",
-    "validation": "Data quality results for every run",
-}
-
-for name, comment in layers.items():
-    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{name} COMMENT '{comment}'")
-    print(f"Ready: {catalog}.{name}")
-
-# COMMAND ----------
-
-spark.sql(
-    f"CREATE VOLUME IF NOT EXISTS {catalog}.bronze.landing "
-    "COMMENT 'Files we download by hand, like the PSGC and census Excel files'"
-)
-print(f"Ready: /Volumes/{catalog}/bronze/landing")
-
-# COMMAND ----------
+spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog}")
+for schema, comment in config.SCHEMAS.items():
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema} COMMENT '{comment}'")
+volume = f"{catalog}.{config.LANDING_VOLUME}"
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {volume} COMMENT 'Files we download by hand'")
 
 display(spark.sql(f"SHOW SCHEMAS IN {catalog}"))
