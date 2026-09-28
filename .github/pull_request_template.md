@@ -28,6 +28,7 @@
 - [ ] No keys, tokens or passwords in the code
 - [ ] My tables pass their data quality checks, or I explained why not
 - [ ] I updated the data dictionary if I added or renamed a column
+- [ ] I updated the docs in this pull request, if they needed it
 - [ ] If AI helped: it works, it scales, it is safe, we can rerun it and trace it, and I can defend every line
 
 Closes #
