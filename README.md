@@ -8,7 +8,7 @@ This project tracks public works projects in the Philippines, from the source da
 
 Built by team Buildabida (LT2) for the FTW Foundation Data Engineering Track capstone, 2026.
 
-> **Status:** Planning. The schema is due on Oct 3, 2026. The run steps below are filled in as each layer is built.
+> **Status:** First pass. The five sources load into bronze, and the checks run. The schema is due on Oct 3, 2026.
 
 ## Who it is for
 
@@ -65,11 +65,11 @@ flowchart LR
 | --- | --- |
 | [DPWH projects API](https://api.dpwh.bettergov.ph/projects) by BetterGov.ph | Every DPWH project with budget, amount paid, progress, dates, contractor and map point. About 265,000 projects as of Sep 2026. |
 | [DPWH Transparency Portal](https://transparency.dpwh.gov.ph) | The official source. We use it to spot-check the API. |
-| [Sumbong sa Pangulo](https://sumbongsapangulo.ph) | Flood control projects, from DPWH |
+| [Sumbong sa Pangulo](https://sumbongsapangulo.ph) | Flood control projects, from the DPWH map layer behind the site |
 | [BetterGov flood control projects](https://bettergov.ph/flood-control-projects/table) | The flood control list named in our brief |
 | [PSGC 2Q 2026](https://psa.gov.ph/classification/psgc) by PSA | Official codes for 18 regions, 82 provinces, 149 cities, 1,493 towns and 42,010 barangays |
-| [2024 Census of Population](https://psa.gov.ph) by PSA | Population of each place |
-| [Boundary maps](https://data.humdata.org/dataset/cod-ab-phl) on HDX | Matching each project's map point to a place |
+| [2024 Census of Population](https://psa.gov.ph/content/2024-census-population-popcen-population-counts-declared-official-president) by PSA | Population of each place. The PSGC file has the 2024 count for every place, and Table B adds 2010 to 2020 and the growth rates. |
+| [Boundary maps](https://github.com/bendlikeabamboo/barangay-boundaries-repository) with PSGC codes (PSA and NAMRIA) | Matching each project's map point to a place |
 
 Notes on the sources:
 
@@ -82,41 +82,35 @@ The final schema is due on Oct 3. This is our starting point.
 
 | Table | One row is | Key |
 | --- | --- | --- |
-| `bronze.dpwh_projects` | One project, as the API returns it | `contract_id` |
-| `bronze.flood_control_projects` | One flood control project | `contract_id` |
-| `bronze.psgc` | One place in the PSGC list | `psgc_code` |
-| `bronze.population_2024` | One place and its 2024 population | `psgc_code` |
-| `silver.projects` | One project from any source, with a PSGC code | `contract_id` |
-| `gold.dim_place` | One region, province, city or town | `psgc_code` |
-| `gold.dim_project_type` | One project type | `project_type_id` |
-| `gold.fact_project` | One project | `contract_id` |
-| `validation.dq_results` | One check on one column in one run | `run_id`, `table_name`, `column_name`, `check_name` |
+| `01-bronze.dpwh_projects` | One project, as the API returns it | `contract_id` |
+| `01-bronze.flood_control_projects` | One flood control project | `contract_id` |
+| `01-bronze.psgc` | One place in the PSGC list | `psgc_code` |
+| `01-bronze.population_2024` | One place and its 2024 population | `psgc_code` |
+| `02-silver.projects` | One project from any source, with a PSGC code | `contract_id` |
+| `03-gold.dim_place` | One region, province, city or town | `psgc_code` |
+| `03-gold.dim_project_type` | One project type | `project_type_id` |
+| `03-gold.fact_project` | One project | `contract_id` |
+| `04-validation.dq_results` | One check on one column in one run | `run_id`, `table_name`, `column_name`, `check_name` |
 
 ## How to run
 
-The full run order is added when the first notebooks are merged.
+Each of us runs the first pass in our own Databricks Free Edition workspace. The full steps are in [notebooks/README.md](notebooks/README.md).
 
-### Requirements
-
-- A Databricks Free Edition account
-- Read access to this repo
-- Databricks access to the source links above. See [Known limits](#known-limits).
-
-### Setup
-
-1. In Databricks, open **Workspace** and go to your home folder.
-2. Click **Create**, then **Git folder**.
-3. Paste `https://github.com/czekinah/buildabida-capstone.git` and click **Create Git folder**.
-4. Before you run anything, click the branch name and then **Pull**.
+1. In Databricks, open **Workspace**, go to your home folder, click **Create**, then **Git folder**, and paste `https://github.com/czekinah/buildabida-capstone.git`.
+2. Run `notebooks/00_setup/00_setup_workspace`.
+3. PSA blocks Databricks, so download the PSGC datafile and census Table B by hand and upload them to the `psa` folder in the `00-source.landing` volume.
+4. Run `notebooks/run_all`. It loads the five sources into `01-bronze` and saves the checks in `04-validation.dq_results`.
+5. Run `notebooks/05_explore/01_explore_first_look` to see what the data says.
 
 ### Run order
 
 | Step | Folder | What it does | Status |
 | --- | --- | --- | --- |
-| 1 | `pipelines/01_bronze` | Loads each source into `bronze` | Planned |
-| 2 | `pipelines/02_silver` | Builds `silver` tables and adds PSGC codes | Planned |
-| 3 | `pipelines/03_gold` | Builds the facts and dimensions | Planned |
-| 4 | `pipelines/04_validation` | Runs all checks and saves the results | Planned |
+| 0 | `notebooks/00_setup` | Makes the catalog, schemas and landing volume | Ready |
+| 1 | `notebooks/01_bronze` | Loads each source into `01-bronze` | Ready |
+| 2 | `notebooks/02_silver` | Builds `02-silver` tables and adds PSGC codes | Planned |
+| 3 | `notebooks/03_gold` | Builds the facts and dimensions | Planned |
+| 4 | `notebooks/04_validation` | Runs all checks and saves the results | Ready for bronze |
 
 ## Validation
 
@@ -125,14 +119,14 @@ Every run checks the data before it moves to the next layer.
 | Check | Example | If it fails |
 | --- | --- | --- |
 | Not null | `contract_id` is never empty | Stop the run |
-| Unique | One row per `contract_id` in `silver.projects` | Stop the run |
+| Unique | One row per `contract_id` in `02-silver.projects` | Stop the run |
 | Row counts | Bronze, silver and gold totals match, after known drops | Stop the run |
 | Valid range | `progress` is from 0 to 100 | Flag the row |
 | Map point | The point is inside the Philippines | Flag the row |
 | Place match | Every project has a PSGC code | Flag and report the match rate |
 | Money | `amount_paid` is not more than `budget` | Flag the row |
 
-Results go to `validation.dq_results` with the same columns we used in Week 9: `column`, `data_quality_check`, `failed_rows`, `total_rows`, `percentage` and `status`.
+Results go to `04-validation.dq_results` with the same columns we used in Week 9: `column`, `data_quality_check`, `failed_rows`, `total_rows`, `percentage` and `status`.
 
 A GitHub Actions check also looks for broken links in our Markdown files on every pull request.
 
@@ -162,7 +156,8 @@ We use AI the way FTW taught us: AI-assisted, human-owned. Before we use AI on p
 ├── README.md          this file
 ├── CONTRIBUTING.md    how we branch, review and merge
 ├── assets/banners/    team images
-├── pipelines/         Databricks notebooks, one folder per layer
+├── notebooks/         Databricks notebooks, one folder per step
+├── src/               shared Python code for the notebooks
 ├── docs/              source cards, schema, data model and decisions
 └── .github/           issue and pull request templates, and checks
 ```
