@@ -23,3 +23,19 @@ jobs:
         with:
           version: "0.16.9"
           args: "format --check --diff"
+
+  sqlfluff:
+    name: Check SQL with SQLFluff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install SQLFluff
+        run: pip install sqlfluff==4.3.0
+
+      - name: Look for mistakes
+        run: sqlfluff lint pipelines --format github-annotation-native
