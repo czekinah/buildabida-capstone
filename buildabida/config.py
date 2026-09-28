@@ -1,16 +1,6 @@
-"""Names and links that every notebook uses. Change them here, not in a notebook."""
+"""Names and links for our Python notebooks. SQL notebooks start with USE CATALOG buildabida."""
 
 CATALOG = "buildabida"
-
-SCHEMAS = {
-    "bronze": "Each source as it came, plus the load time",
-    "silver": "Cleaned data with PSGC codes",
-    "gold": "Facts and dimensions for the dashboard and Genie",
-    "validation": "Data quality results for every run",
-}
-
-# Files we download by hand, like the PSGC and census files, go here.
-LANDING_VOLUME = "bronze.landing"
 
 # Tells each website who is asking.
 USER_AGENT = "buildabida-capstone (github.com/czekinah/buildabida-capstone)"
