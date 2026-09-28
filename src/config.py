@@ -1,0 +1,53 @@
+"""Names and links for our notebooks. Change a link here, and every notebook gets it."""
+
+CATALOG = "buildabida-capstone"
+SOURCE = "00-source"
+BRONZE = "01-bronze"
+VALIDATION = "04-validation"
+
+# Files we save before we load them: API pages and files we download by hand.
+LANDING = f"/Volumes/{CATALOG}/{SOURCE}/landing"
+
+REPO = "github.com/czekinah/buildabida-capstone"
+
+# Tells each website who is asking.
+USER_AGENT = f"buildabida ({REPO})"
+
+# 1. DPWH projects, through the BetterGov.ph API. Up to 5,000 projects per page.
+DPWH_API = "https://api.dpwh.bettergov.ph/projects"
+DPWH_PAGE_SIZE = 5000
+
+# 2. Flood control projects, the DPWH map layer behind sumbongsapangulo.ph. Up to 1,000 per call.
+FLOOD_LAYER = (
+    "https://services1.arcgis.com/IwZZTMxZCmAmFYvF/arcgis/rest/services/"
+    "FloodControl_Data_20250802_v6_corrected_coordinates_for_uploading/FeatureServer/0/query"
+)
+FLOOD_PAGE_SIZE = 1000
+
+# 3 and 4. PSA blocks Databricks, so we download these by hand into LANDING/psa.
+# The PSGC file also has the 2024 population of every place, with its code.
+PSA_FOLDER = f"{LANDING}/psa"
+PSGC_FILE_PATTERN = "PSGC-*Publication-Datafile*.xlsx"
+CENSUS_TABLE_B_PATTERN = "*Table B*.xlsx"
+
+# 5. Boundary maps with PSGC codes (PSA and NAMRIA, 2023-10-24 snapshot).
+# The link is pinned to one commit, so the files never change under us.
+BOUNDARY_SNAPSHOT = "2023-10-24"
+BOUNDARY_BASE = (
+    "https://raw.githubusercontent.com/bendlikeabamboo/barangay-boundaries-repository/"
+    "edf53994c8f217d9e1ce3f74c3d0a78025e0812a/2023-10-24/hierarchical_t0p005/"
+)
+BOUNDARY_FILES = [
+    "regions.geojson",
+    "provinces.geojson",
+    "highly_urbanized_cities.geojson",
+    "independent_component_cities.geojson",
+    "component_cities.geojson",
+    "municipalities.geojson",
+    "special_geographic_areas.geojson",
+    "barangays.geojson",
+]
+
+# A map point outside this box is not in the Philippines.
+PH_LAT = (4.2, 21.3)
+PH_LON = (116.0, 127.0)
