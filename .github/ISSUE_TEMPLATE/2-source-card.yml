@@ -32,6 +32,15 @@ body:
         - Shapefile or GeoJSON
         - Web page
         - Other
+  - type: dropdown
+    id: reach
+    attributes:
+      label: "Can Databricks reach it?"
+      description: "Run pipelines/00_setup/01_check_sources to find out."
+      options:
+        - "Yes, we load it with code"
+        - "No, we download it by hand"
+        - "Not checked yet"
   - type: input
     id: size
     attributes:
