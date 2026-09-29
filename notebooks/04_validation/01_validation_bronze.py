@@ -78,7 +78,8 @@ CHECKS = [
     ("boundaries", "row count", "matches the files", log_count("boundaries"), "stop"),
     ("boundaries", "geometry_json", "not null", "COUNT_IF(geometry_json IS NULL)", "stop"),
     ("boundaries", "psgc_code", "not null", "COUNT_IF(psgc_code IS NULL)", "flag"),
-    ("boundaries", "psgc_code", "found in the current PSGC", f"COUNT_IF(psgc_code NOT IN (SELECT psgc_code FROM {bronze.table_name('psgc')}))", "flag"),
+    # Shapes with no code are counted by the not null check above, so this check skips them.
+    ("boundaries", "psgc_code", "found in the current PSGC", f"COUNT_IF(psgc_code IS NOT NULL AND psgc_code NOT IN (SELECT psgc_code FROM {bronze.table_name('psgc')}))", "flag"),
 ]
 
 # COMMAND ----------
