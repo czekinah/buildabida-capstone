@@ -4,10 +4,10 @@ Our Databricks notebooks, one folder per step. Each folder writes to the schema 
 
 | Order | Folder | Writes to | What it does |
 | --- | --- | --- | --- |
-| 0 | `00_setup` | `00-source` | Makes the catalog, the schemas and the landing volume |
+| 0 | `00_setup` | `00-source` | Makes the catalog, the schemas and the landing volume, and checks which sources Databricks can reach |
 | 1 | `01_bronze` | `01-bronze` | Loads each source as it came, plus the load time |
 | 4 | `04_validation` | `04-validation` | Runs the checks and saves the results |
-| 5 | `05_explore` | nothing | A first look at what the data says about our questions |
+| 5 | `05_explore` | nothing | A first look at what the data says about our questions, and a check of the repeated flood contract IDs |
 
 `run_all.py` runs steps 0, 1 and 4 in order.
 
