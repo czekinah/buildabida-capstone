@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # First look: what the bronze data says about our questions
 # MAGIC
-# MAGIC A first pass, before silver. It reads only `01-bronze` tables, so every number here traces back to a source.
+# MAGIC A first pass, before silver. It reads only `01-bronze` tables, so every number here traces back to a source. It only checks if the data can answer our questions. The real answers come from silver and gold.
 # MAGIC
 # MAGIC | Question | Section |
 # MAGIC | --- | --- |
@@ -13,7 +13,7 @@
 # MAGIC | 5. Which places have many people but few projects? | 2, 8 |
 # MAGIC | 6. What types of infrastructure get funded? | 4 |
 # MAGIC
-# MAGIC Money is the `budget` column: DPWH projects from 2016 to 2026, all statuses. Per person uses the 2024 census.
+# MAGIC Money is the `budget` column: DPWH projects from 2016 to 2026, all statuses. Per person uses the 2024 census count in the PSGC file. Silver will use census Table C (D-18).
 # MAGIC
 # MAGIC Limits of a first pass: BARMM has no DPWH projects here, because the Bangsamoro government builds its own. Province numbers use the map point, and about 1 in 5 projects has none.
 
