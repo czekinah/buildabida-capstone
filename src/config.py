@@ -26,6 +26,7 @@ FLOOD_PAGE_SIZE = 1000
 
 # 3 and 4. PSA blocks Databricks, so we download these by hand into LANDING/psa.
 # The PSGC file also has the 2024 population of every place, with its code.
+# Our population source is census Table C (D-18). We use the PSGC count to cross-check it.
 PSA_FOLDER = f"{LANDING}/psa"
 PSGC_FILE_PATTERN = "PSGC-*Publication-Datafile*.xlsx"
 CENSUS_TABLE_B_PATTERN = "*Table B*.xlsx"
@@ -37,6 +38,9 @@ BOUNDARY_BASE = (
     "https://raw.githubusercontent.com/bendlikeabamboo/barangay-boundaries-repository/"
     "edf53994c8f217d9e1ce3f74c3d0a78025e0812a/2023-10-24/hierarchical_t0p005/"
 )
+# We load 7 of the 8 files (D-17). We skip special_geographic_areas.geojson: its 8 parts have
+# no PSGC code, the special area barangays are already in barangays.geojson, and its outline
+# covers the same ground as its parts, so a project could be counted twice.
 BOUNDARY_FILES = [
     "regions.geojson",
     "provinces.geojson",
@@ -44,7 +48,6 @@ BOUNDARY_FILES = [
     "independent_component_cities.geojson",
     "component_cities.geojson",
     "municipalities.geojson",
-    "special_geographic_areas.geojson",
     "barangays.geojson",
 ]
 
