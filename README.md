@@ -68,13 +68,14 @@ flowchart LR
 | [Sumbong sa Pangulo](https://sumbongsapangulo.ph) | Flood control projects, from the DPWH map layer behind the site |
 | [BetterGov flood control projects](https://bettergov.ph/flood-control-projects/table) | The flood control list named in our brief |
 | [PSGC 2Q 2026](https://psa.gov.ph/classification/psgc) by PSA | Official codes for 18 regions, 82 provinces, 149 cities, 1,493 towns and 42,010 barangays |
-| [2024 Census of Population](https://psa.gov.ph/content/2024-census-population-popcen-population-counts-declared-official-president) by PSA | Population of each place. The PSGC file has the 2024 count for every place, and Table B adds 2010 to 2020 and the growth rates. |
-| [Boundary maps](https://github.com/bendlikeabamboo/barangay-boundaries-repository) with PSGC codes (PSA and NAMRIA) | Matching each project's map point to a place |
+| [2024 Census of Population](https://psa.gov.ph/content/2024-census-population-popcen-population-counts-declared-official-president) by PSA | Population of each place. Table C has the 2024 count for every barangay, and it is our population source. The PSGC file has the same 2024 count, so we use it as a cross-check. Table B adds 2010 to 2020 and the growth rates. |
+| [Boundary maps](https://github.com/bendlikeabamboo/barangay-boundaries-repository) with PSGC codes (PSA and NAMRIA) | Matching each project's map point to a place. We load 7 of the 8 files and skip the special areas file. |
 
 Notes on the sources:
 
 - In the API, `location.province` holds a DPWH district office name, like `Albay 2nd DEO`. It is not a PSGC province. We use the map point and the boundary maps to find the real place.
 - Some projects may appear in both the DPWH list and the flood control list. We match them by contract ID so we do not count them twice.
+- In the flood control list, 109 contract IDs repeat, for 157 extra rows. They are parts of one contract or one part split by funding year, not copies, so bronze keeps them. See [the check](notebooks/05_explore/02_explore_flood_repeats.py).
 
 ## Data model (draft)
 
@@ -85,7 +86,7 @@ The final schema is due on Oct 3. This is our starting point.
 | `01-bronze.dpwh_projects` | One project, as the API returns it | `contract_id` |
 | `01-bronze.flood_control_projects` | One flood control project | `contract_id` |
 | `01-bronze.psgc` | One place in the PSGC list | `psgc_code` |
-| `01-bronze.population_2024` | One place and its 2024 population | `psgc_code` |
+| `01-bronze.population_2024` | One place and its 2024 population from the PSGC file, our cross-check for Table C | `psgc_code` |
 | `02-silver.projects` | One project from any source, with a PSGC code | `contract_id` |
 | `03-gold.dim_place` | One region, province, city or town | `psgc_code` |
 | `03-gold.dim_project_type` | One project type | `project_type_id` |
