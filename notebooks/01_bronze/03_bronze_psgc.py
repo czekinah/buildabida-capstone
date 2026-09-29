@@ -32,23 +32,43 @@ print("Reading", path)
 
 # Find each column by its header, so a new release with moved columns still loads.
 rows = xlsx.read_sheet(path, "PSGC")
-header = [cell.lower() for cell in rows[0][1]]
 
 
-def column(starts_with):
-    return next(i for i, name in enumerate(header) if name.startswith(starts_with))
+def clean(text):
+    """Header text on one line, in lower case. Some headers break over two lines in Excel."""
+    return " ".join(text.split()).lower()
+
+
+def header_row(rows):
+    """The header is the first row with a "10-digit PSGC" column."""
+    for position, (_, cells) in enumerate(rows):
+        if any("10-digit psgc" in clean(c) for c in cells):
+            return position
+    raise ValueError('No row has a "10-digit PSGC" column. Is this the PSGC publication datafile?')
+
+
+start = header_row(rows)
+header = [clean(c) for c in rows[start][1]]
+
+
+def column(*words):
+    """The first column whose header has all these words."""
+    for index, name in enumerate(header):
+        if all(word in name for word in words):
+            return index
+    raise ValueError(f"No column has {words}. The headers are: {header}")
 
 
 want = {
     "psgc_code": column("10-digit psgc"),
     "name": column("name"),
-    "correspondence_code": column("correspondence code"),
+    "correspondence_code": column("correspondence"),
     "geographic_level": column("geographic level"),
     "old_names": column("old names"),
     "city_class": column("city class"),
-    "income_class": column("income classification"),
-    "urban_rural": column("urban / rural"),
-    "population_2024": column("2024 population"),
+    "income_class": column("income"),
+    "urban_rural": column("urban", "rural"),
+    "population_2024": column("2024", "population"),
     "status": column("status"),
 }
 
@@ -58,7 +78,7 @@ def cell(cells, index):
 
 
 places = []
-for row_number, cells in rows[1:]:
+for row_number, cells in rows[start + 1:]:
     code = cell(cells, want["psgc_code"])
     if code is None:
         continue
