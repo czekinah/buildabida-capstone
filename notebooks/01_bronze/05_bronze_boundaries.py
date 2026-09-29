@@ -4,6 +4,8 @@
 # MAGIC
 # MAGIC Loads the shapes of regions, provinces, cities, towns and barangays into `01-bronze`.`boundaries`. One row is one shape. Each shape has its PSGC code, so silver can find the place of every project map point.
 # MAGIC
+# MAGIC We load 7 of the 8 files in the snapshot, 43,760 shapes. We skip the special areas file (D-17). The reason is in `src/config.py`.
+# MAGIC
 # MAGIC The shapes come from the barangay-boundaries-repository on GitHub (PSA codes on NAMRIA maps, snapshot 2023-10-24, MIT license). The link in `src/config.py` is pinned to one commit, so the files never change under us.
 # MAGIC
 # MAGIC 1. Downloads each file as it came into the landing volume.
@@ -66,12 +68,14 @@ for name in config.BOUNDARY_FILES:
 # COMMAND ----------
 
 # 3. Read the lines with a set schema, so Spark does not scan the big shapes to guess types.
+# Read only the files we load, so an old file left in the folder is never counted.
+row_files = [f"{rows_folder}/{name.removesuffix('.geojson')}.json" for name in config.BOUNDARY_FILES]
 schema = (
     "boundary_class string, psgc_code string, psgc_name string, psgc_type string, psgc_status string, "
     "match_confidence double, match_method string, area_sqkm double, properties_json string, "
     "geometry_type string, geometry_json string, source_file string"
 )
-shapes = spark.read.schema(schema).json(rows_folder)
+shapes = spark.read.schema(schema).json(row_files)
 loaded = bronze.save_table(spark, shapes, "boundaries")
 bronze.log_load(spark, "Boundary maps (2023-10-24)", "boundaries", expected, loaded, folder)
 print(f"Loaded {loaded:,} of {expected:,} shapes.")

@@ -5,7 +5,7 @@
 # MAGIC Loads the PSA PSGC publication datafile into two tables:
 # MAGIC
 # MAGIC - `01-bronze`.`psgc`: one row per place (region, province, city, town, submunicipality or barangay). The key is `psgc_code`.
-# MAGIC - `01-bronze`.`population_2024`: one row per place with its 2024 census count. The PSGC file carries the official 2024 population, so every count already has its code.
+# MAGIC - `01-bronze`.`population_2024`: one row per place with its 2024 census count. The PSGC file carries the official 2024 population, so every count already has its code. Our population source is census Table C (D-18), so we use this table to cross-check it.
 # MAGIC
 # MAGIC PSA blocks Databricks, so download the file by hand first:
 # MAGIC

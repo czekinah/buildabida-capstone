@@ -4,7 +4,7 @@
 # MAGIC
 # MAGIC Loads PSA's 2024 census Table B into `01-bronze`.`census_2024_table_b`. It has the population of every region, province, city and town in 2010, 2015, 2020 and 2024, plus the growth rates. One row is one row of the table, in the order PSA wrote it.
 # MAGIC
-# MAGIC The 2024 count for every place, with its PSGC code, is in `01-bronze`.`population_2024`. This table adds the older counts and the growth rates, so we can see which places grow fast.
+# MAGIC This table is optional. It adds the older counts and the growth rates, so we can see which places grow fast. Our 2024 population source is census Table C (D-18), and `01-bronze`.`population_2024` from the PSGC file is our cross-check.
 # MAGIC
 # MAGIC PSA blocks Databricks, so download the file by hand first:
 # MAGIC
