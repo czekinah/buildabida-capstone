@@ -2,13 +2,15 @@
   <img src="assets/banners/github-readme.png" alt="Buildabida. Every project. Every peso. Every place." width="100%">
 </p>
 
+> **Archived on Oct 1, 2026.** Our team works in [Buildabida/infra-project-monitoring](https://github.com/Buildabida/infra-project-monitoring) now. This repo keeps my first pass from Sep 29, in [pull request #21](https://github.com/czekinah/buildabida-capstone/pull/21). The team version of the bronze loads merged in [#41](https://github.com/Buildabida/infra-project-monitoring/pull/41) on Sep 30.
+
 # Infrastructure Project Monitoring Pipeline
 
 This project tracks public works projects in the Philippines, from the source data to a dashboard. It joins DPWH project records with official place codes (PSGC) and the 2024 census. This lets us see where project money goes, how far each project has gone, and how that compares with the number of people in each place.
 
 Built by team Buildabida (LT2) for the FTW Foundation Data Engineering Track capstone, 2026.
 
-> **Status:** Planning. The schema is due on Oct 3, 2026. The run steps below are filled in as each layer is built.
+> **Status:** Archived on Oct 1, 2026. The team repo has the current status.
 
 ## Who it is for
 
